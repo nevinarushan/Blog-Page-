@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Blog</title>
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <div class="container">
-    <h1>My Blog</h1>
+<%- include('header') %>
+    <h1>Bloggers Welcome</h1>
     <a href="/new" class="btn">Create New Post</a>
     <div class="posts">
       <% if (posts.length === 0) { %>
@@ -17,8 +8,16 @@
       <% posts.forEach(post => { %>
         <div class="post">
           <h2><%= post.title %></h2>
-          <p><%= post.content %></p>
+          <% if (post.images && post.images.length > 0) { %>
+            <div class="post-images-grid">
+              <% post.images.forEach(image => { %>
+                <img src="<%= image %>" alt="Post Image" class="post-image" style="width: 300px; height: 300px;">
+              <% }) %>
+            </div>
+          <% } %>
+          <p><%= post.content.substring(0, 150) %><% if (post.content.length > 150) { %>...<% } %></p>
           <div class="actions">
+            <a href="/post/<%= post.id %>" class="btn">Read More</a>
             <a href="/edit/<%= post.id %>" class="btn">Edit</a>
             <form action="/delete/<%= post.id %>" method="POST" style="display:inline;">
               <button type="submit" class="btn btn-danger">Delete</button>
@@ -27,6 +26,4 @@
         </div>
       <% }) %>
     </div>
-  </div>
-</body>
-</html> 
+  <%- include('footer') %> 

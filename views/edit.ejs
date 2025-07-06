@@ -1,20 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Post</title>
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <div class="container">
+<%- include('header') %>
     <h1>Edit Post</h1>
-    <form action="/edit/<%= post.id %>" method="POST">
+    <form action="/edit/<%= post.id %>" method="POST" enctype="multipart/form-data" class="edit-form-container">
+      <div class="current-images">
+        <h3>Current Images</h3>
+        <div id="current-images-container" class="post-images-grid">
+          <% post.images.forEach(image => { %>
+            <div class="image-preview" data-image="<%= image %>">
+              <img src="<%= image %>" alt="Post Image">
+              <button type="button" class="btn-remove-image">&times;</button>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <label for="image-upload" class="btn btn-image-upload">Add More Images</label>
+      <input type="file" id="image-upload" name="images" accept="image/*" multiple style="display: none;">
+      <div id="new-images-container"></div>
+      
+      <input type="hidden" name="existingImages" id="existing-images" value="<%= post.images.join(',') %>">
+      
       <input type="text" name="title" value="<%= post.title %>" required>
       <textarea name="content" required><%= post.content %></textarea>
-      <button type="submit" class="btn">Update</button>
-      <a href="/" class="btn btn-secondary">Cancel</a>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Update</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+      </div>
     </form>
-  </div>
-</body>
-</html> 
+
+    <script>
+      const imageUpload = document.getElementById('image-upload');
+      const newImagesContainer = document.getElementById('new-images-container');
+      const currentImagesContainer = document.getElementById('current-images-container');
+      const existingImagesInput = document.getElementById('existing-images');
+
+      imageUpload.addEventListener('change', () => {
+        newImagesContainer.innerHTML = '';
+        for (const file of imageUpload.files) {
+          const preview = document.createElement('div');
+          preview.className = 'image-preview';
+          
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          
+          const loading = document.createElement('div');
+          loading.className = 'loading-bar';
+          
+          const name = document.createElement('p');
+          name.textContent = file.name;
+
+          preview.appendChild(img);
+          preview.appendChild(loading);
+          preview.appendChild(name);
+          newImagesContainer.appendChild(preview);
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            loading.style.width = '100%';
+            setTimeout(() => {
+              loading.style.display = 'none';
+            }, 500);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      currentImagesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-remove-image')) {
+          const imagePreview = e.target.closest('.image-preview');
+          const imageToRemove = imagePreview.dataset.image;
+          
+          let existingImages = existingImagesInput.value.split(',').filter(img => img.trim() !== '');
+          existingImages = existingImages.filter(img => img !== imageToRemove);
+          existingImagesInput.value = existingImages.join(',');
+          
+          imagePreview.remove();
+        }
+      });
+    </script>
+<%- include('footer') %> 

@@ -1,0 +1,40 @@
+<%- include('header') %>
+
+<div class="post-full">
+  <h1><%= post.title %></h1>
+  
+  <% if (post.images && post.images.length > 0) { %>
+    <div class="post-images-grid">
+      <% post.images.forEach(image => { %>
+        <img src="<%= image %>" alt="Post Image" class="post-image">
+      <% }) %>
+    </div>
+  <% } %>
+  
+  <div class="post-content">
+    <p><%= post.content %></p>
+  </div>
+</div>
+
+<div class="comments-section">
+  <h2>Comments</h2>
+  
+  <% if (post.comments && post.comments.length > 0) { %>
+    <% post.comments.forEach(comment => { %>
+      <div class="comment">
+        <p><strong><%= comment.author %>:</strong> <%= comment.content %></p>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No comments yet. Be the first to comment!</p>
+  <% } %>
+  
+  <form action="/post/<%= post.id %>/comment" method="POST" class="comment-form">
+    <h3>Leave a Comment</h3>
+    <input type="text" name="author" placeholder="Your Name" required>
+    <textarea name="content" placeholder="Your Comment" required></textarea>
+    <button type="submit" class="btn">Submit Comment</button>
+  </form>
+</div>
+
+<%- include('footer') %>
